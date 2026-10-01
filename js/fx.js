@@ -11,7 +11,7 @@ export class FX {
     this.gap = reduced ? gap * 2 : gap;
     this.count = Math.round(count * this.scale);
     this.usePart = particles; this.useFw = fireworks;
-    this.stars = []; this.rockets = []; this.sparks = [];
+    this.stars = []; this.rockets = []; this.sparks = []; this.shoots = [];
     this.running = false; this.firing = false; this.last = 0; this.nextLaunch = 0; this.raf = 0;
     this.loop = this.loop.bind(this);
     addEventListener("resize", () => this.resize());
@@ -47,6 +47,15 @@ export class FX {
         decay: 0.008 + Math.random() * 0.012, hue: r.hue + Math.random() * 30 });
     }
   }
+  // ট্যাপ করলে হার্ট ছড়িয়ে পড়ে
+  burst(x, y, n = 14) {
+    for (let i = 0; i < n; i++) {
+      const a = Math.random() * 6.283, s = Math.random() * 3 + 1;
+      this.sparks.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s - 2, life: 1, decay: 0.012, hue: 330 + Math.random() * 50, heart: true });
+    }
+    if (this.running && !this.raf) this.start();
+  }
+  finale() { if (!this.useFw) return; for (let i = 0; i < 6; i++) setTimeout(() => this.running && this.launch(), i * 280); }
   loop(t) {
     this.raf = requestAnimationFrame(this.loop);
     const dt = Math.min((t - this.last) / 16.67, 3); this.last = t;
@@ -66,12 +75,19 @@ export class FX {
       g.globalAlpha = 1; g.fillStyle = `hsl(${r.hue} 100% 80%)`; g.fillRect(r.x, r.y, 2, 6);
       if (r.y <= r.peak || Math.abs(r.vy) < 1.2) { this.explode(r); this.rockets.splice(i, 1); }
     }
+    if (this.usePart && Math.random() < 0.004) this.shoots.push({ x: Math.random() * this.w, y: Math.random() * this.h * 0.4, vx: 7, vy: 3, life: 1 });
+    for (let i = this.shoots.length - 1; i >= 0; i--) {
+      const s = this.shoots[i]; s.x += s.vx * dt; s.y += s.vy * dt; s.life -= 0.02 * dt;
+      if (s.life <= 0) { this.shoots.splice(i, 1); continue; }
+      g.globalAlpha = s.life; g.strokeStyle = "#fff"; g.lineWidth = 1.5;
+      g.beginPath(); g.moveTo(s.x, s.y); g.lineTo(s.x - s.vx * 6, s.y - s.vy * 6); g.stroke();
+    }
     for (let i = this.sparks.length - 1; i >= 0; i--) {
       const p = this.sparks[i];
       p.vx *= 0.985; p.vy = p.vy * 0.985 + 0.035 * dt; p.x += p.vx * dt; p.y += p.vy * dt; p.life -= p.decay * dt;
       if (p.life <= 0) { this.sparks.splice(i, 1); continue; }
       g.globalAlpha = p.life; g.fillStyle = `hsl(${p.hue} 100% ${55 + p.life * 20}%)`;
-      g.fillRect(p.x, p.y, 2.2, 2.2);
+      if (p.heart) { g.font = "16px serif"; g.fillText("♥", p.x, p.y); } else g.fillRect(p.x, p.y, 2.2, 2.2);
     }
     g.globalAlpha = 1; g.globalCompositeOperation = "source-over";
   }
