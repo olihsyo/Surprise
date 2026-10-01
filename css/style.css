@@ -77,3 +77,53 @@ main{position:relative;z-index:1;min-height:100dvh;display:grid;place-items:cent
   *,*::before,*::after{animation-duration:.01ms!important;animation-delay:0s!important;transition-duration:.3s!important}
   [data-step]{filter:none;transform:none}
 }
+
+/* ===== v2: নতুন ইফেক্ট ===== */
+@property --a{syntax:"<angle>";inherits:false;initial-value:0deg}
+body::before{content:"";position:fixed;inset:-25%;z-index:0;pointer-events:none;opacity:.85;
+  background:radial-gradient(38% 38% at 20% 30%,color-mix(in srgb,var(--accent-primary) 22%,transparent),transparent),
+             radial-gradient(34% 34% at 80% 70%,rgba(120,90,255,.2),transparent);
+  animation:drift 20s ease-in-out infinite alternate}
+@keyframes drift{to{transform:translate(6%,-5%) rotate(14deg) scale(1.1)}}
+
+.card{transform:perspective(1000px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));transition:transform .25s ease-out}
+.spark{animation:beat 2.4s ease-in-out infinite}
+@keyframes beat{0%,100%{transform:scale(1)}50%{transform:scale(1.35)}}
+
+.name{background:none;-webkit-background-clip:initial;background-clip:initial;color:#fff;
+  text-shadow:0 0 36px color-mix(in srgb,var(--accent-primary) 55%,transparent)}
+.ch{display:inline-block;opacity:0;transform:translateY(26px) scale(.7);filter:blur(8px);
+  transition:opacity 1s ease,transform 1s cubic-bezier(.2,1.3,.3,1),filter 1s ease;transition-delay:calc(var(--i)*90ms)}
+.name.in .ch{opacity:1;transform:none;filter:none}
+
+.photo{position:relative;overflow:visible}
+.photo::before{content:"";position:absolute;inset:-5px;border-radius:inherit;padding:2px;pointer-events:none;
+  background:conic-gradient(from var(--a),var(--accent-primary),var(--accent-secondary),transparent 45%,var(--accent-primary));
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;
+  mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0);animation:spin 6s linear infinite}
+.photo.in{animation:float 6s ease-in-out infinite}
+@keyframes spin{to{--a:360deg}}
+@keyframes float{50%{transform:translateY(-8px)}}
+
+.final{white-space:normal;max-width:34ch}
+.final .ln{display:block;opacity:0;transform:translateY(10px);transition:opacity 1s ease,transform 1s ease;transition-delay:calc(var(--i)*500ms)}
+.final.in .ln{opacity:1;transform:none}
+.final .gap{height:.8em}
+
+.wish{font:inherit;font-size:1.05rem;color:#fff;cursor:pointer;min-height:48px;padding:12px 28px;border-radius:999px;
+  border:1px solid var(--accent-primary);background:color-mix(in srgb,var(--accent-primary) 18%,transparent);animation:pulse 2.8s infinite}
+.wish:active{transform:scale(.96)}
+.wishbox{position:fixed;inset:0;z-index:20;display:grid;place-items:center;padding:24px;
+  background:rgba(5,2,10,.6);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);animation:fadeBox .4s both}
+.wishbox>div{width:min(90vw,420px);text-align:center;padding:34px 24px;border-radius:var(--radius-large);
+  border:1px solid var(--border-color);background:linear-gradient(160deg,rgba(255,255,255,.14),rgba(255,255,255,.05));
+  box-shadow:0 0 80px color-mix(in srgb,var(--accent-primary) 30%,transparent);display:grid;gap:24px;justify-items:center;
+  animation:pop .6s cubic-bezier(.2,1.2,.3,1) both}
+#wishText{font-size:1.3rem;line-height:1.9}
+@keyframes fadeBox{from{opacity:0}}
+@keyframes pop{from{opacity:0;transform:scale(.7) rotate(-3deg)}}
+
+@media (prefers-reduced-motion:reduce){
+  body::before,.spark,.photo::before,.photo.in,.wish,.begin{animation:none}
+  .begin{opacity:1}.card{transform:none}
+}
