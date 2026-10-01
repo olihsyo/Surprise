@@ -30,8 +30,16 @@
       <div class="placeholder" id="placeholder" hidden aria-hidden="true">♥</div>
     </figure>
     <p class="final" id="final" data-step></p>
+    <button id="wishBtn" class="wish" type="button" data-step>💌 একটা উইশ খোলো</button>
   </section>
 </main>
+
+<div id="wishBox" class="wishbox" hidden>
+  <div role="dialog" aria-modal="true" aria-label="উইশ">
+    <p id="wishText"></p>
+    <button id="wishClose" class="icon-btn" type="button">ঠিক আছে ❤️</button>
+  </div>
+</div>
 
 <div class="controls" id="controls" hidden>
   <button id="mute" class="icon-btn" type="button" aria-label="Mute music" aria-pressed="false">🔊</button>
